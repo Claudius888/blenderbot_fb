@@ -35,24 +35,20 @@ def receive_message():
                 #Facebook Messenger ID for user so we know where to send response back to
                 recipient_id = message['sender']['id']
                 text = message['message'].get('text')
-                print("message",text)
-                if text == "exit":
+                if text == 'exit':
                     reset()
-                    send_message(recipient_id, "See you later ;)")
-                elif text: 
+                    send_message(recipient_id, 'See you later ;)')
+                elif text:
                     response_sent_text = get_message(text)
-                    print("Response text", response_sent_text)
-                    send_message(recipient_id, response_sent_text)
+                    resp_text = response_sent_text[-1]['text']
+                    send_message(recipient_id, resp_text)
                 #if user sends us a GIF, photo,video, or any other non-text item
                 if message['message'].get('attachments'):
                     response_sent_nontext = get_message(text)
-                    print("Response text", response_sent_text)
                     send_message(recipient_id, response_sent_nontext)
     return "Message Processed"
 
 def get_message(text):
-    # sample_responses = ["You are stunning!", "We're proud of you.", "Keep on being you!", "We're greatful to know you :)"]
-    # return selected item to the user
     return add_input(text)
 
 #uses PyMessenger to send response to user
@@ -61,7 +57,6 @@ def send_message(recipient_id, response):
     bot.send_text_message(recipient_id, response)
     return "success"
 
-# @app.route('/add_input', methods = ['GET', 'POST'])
 def add_input(text_message):
     # text = request.json['text']
     text = text_message
@@ -77,7 +72,7 @@ def add_input(text_message):
     #     'uuid': result.uuid,
     #     'messages': messages
     # }
-    return messages[-1]['text']
+    return messages
 
 def verify_fb_token(token_sent):
     #take token sent by facebook and verify it matches the verify token you sent
@@ -93,15 +88,19 @@ def verify_fb_token(token_sent):
 
 # @app.route('/reset', methods = ['GET', 'POST'])
 def reset():
-     global conversation
-     conversation = Conversation()
-     return 'ok' 
+    global conversation
+    conversation = Conversation()
+    return 'ok' 
 
-@app.route('/init_persona', methods = ['GET', 'POST'])
-def init():
-     text = request.json['text']
-     conversation.add_user_input('Hello')
-     conversation.append_response(text)
-     # Put the user's messages as "old message".
-     conversation.mark_processed()
-     return 'ok' 
+# @app.route('/init_persona', methods = ['GET', 'POST'])
+def init(text_message):
+    #  text = request.json['text']
+    text = text_message
+    conversation.add_user_input('Hello')
+    conversation.append_response(text)
+    # Put the user's messages as "old message".
+    conversation.mark_processed()
+    return 'ok' 
+
+if __name__ == "__main__":
+    app.run()
